@@ -88,6 +88,7 @@ module.exports = {
                     creator: senderID,
                     wolfs_alive: [],
                     villagers_alive: [],
+                    seer_alive: [],
                     wolfs_dead: [],
                     villagers_dead: [],
                     wolfs_vote: [],

@@ -12,6 +12,7 @@ let gameSchema = new Schema(
         creator: {type: "string"},
         wolfs_alive: {type: "array"},
         villagers_alive: {type: "array"},
+        seer_alive: {type: "array"},
         wolfs_vote: {type: "array"},
         villagers_vote: {type: "array"},
         wolfs_dead: {type: "array"},
@@ -23,6 +24,13 @@ let gameSchema = new Schema(
     }
 );
 
+async function getRepository(gameSchema){
+
+    const client = await connect();
+    return client.fetchRepository(gameSchema);
+
+}
+
 /**
  *
  * @param data PLAIN JS OBJECT
@@ -31,11 +39,11 @@ let gameSchema = new Schema(
 
 module.exports = {
 
+
     async createGame(data) {
         const client = await connect();
 
-        const repository = new Repository(gameSchema, client)
-
+        const repository = getRepository(gameSchema);
 
         if(await client.execute(['DBSIZE']) === 0){
             await repository.createIndex();
@@ -46,6 +54,24 @@ module.exports = {
         const id = await repository.save(game);
 
         return repository;
+    },
+
+    async getGame(voiceID) {
+
+        const repository = getRepository(gameSchema);
+
+        return await repository.search().where('voice_channel_id').equals(voiceID).return.first();
+
+    },
+
+    async modifyGame(game){
+
+        const client = await connect();
+
+        const repository = new Repository(gameSchema, client);
+
+        await repository.save(game);
+
     }
 
 }

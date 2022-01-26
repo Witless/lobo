@@ -8,5 +8,7 @@ module.exports = {
             await client.open(process.env.REDIS_URL);
         }
         return client;
-    }
+    },
+
+
 }

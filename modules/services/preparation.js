@@ -32,7 +32,7 @@ module.exports = {
                 console.log(voiceChannel.name)
 
                 console.log("size ->" + voiceChannel.members.size)
-                let lobosSize = 2
+                let lobosSize = 1 //TODO Cambiar esto, solo está puesto por motivos de tests
 
                 if(voiceMembersSize >= 12 && voiceMembersSize <= 17){
                     lobosSize = 3;
@@ -42,7 +42,7 @@ module.exports = {
 
                 let rolesArray = []
 
-                //Villagers are considered 0 in the "rolesArray", Wolfs are considered 1
+                //Villagers are considered 0 in the "rolesArray", Wolfs are considered 1, Seer is 2
 
                 for(let i = 0; i < voiceMembersSize; i++){
                     rolesArray[i] = 0
@@ -55,12 +55,21 @@ module.exports = {
                     }
                 }
 
+                let exitFlag = true;
+
+                while(exitFlag){
+                    const randomNumber = randomIntFromInterval(0, voiceMembersSize-1);
+                    if(rolesArray[randomNumber] !== 1){
+                        rolesArray[randomNumber] = 2;
+                        exitFlag = false;
+                    }
+                }
+
                 let i = 0;
                 let ctrlFlag = 1;
 
                 voiceChannel.members.forEach((member) => {
                         if (rolesArray[i] === 0) {
-                            console.log(member.id);
                             gameObject[0].villagers_alive.push(member.id);
                             member.send({embeds: [buildRoleBasedEmbeds('Aldeano', 'https://i.imgur.com/1r5cKGG.png', 'Junto a tus compañeros, acaba con los lobos')]}).catch(() => {
                                 ctrlFlag = 0;
@@ -69,9 +78,16 @@ module.exports = {
                                 discordClient.guilds.cache.get(gameObject[0].guild_id).channels.cache.get(gameObject[0].voice_channel_id).delete("Error provocado por jugador")
                             })
                         } else if (rolesArray[i] === 1) {
-                            console.log(member.id);
                             gameObject[0].wolfs_alive.push(member.id);
                             member.send({embeds: [buildRoleBasedEmbeds('Lobo', 'https://i.imgur.com/W0Fzfcv.png', 'Debes acabar con el resto de aldeanos')]}).catch(() => {
+                                ctrlFlag = 0;
+                                discordClient.guilds.cache.get(gameObject[0].guild_id).channels.cache.get(gameObject[0].text_channel_id).send({embeds:[new MessageEmbed().setTitle('Juego Cancelado').setDescription('Error a la hora de enviar un rol por MD, todos debéis tenerlos abiertos' +
+                                        '\n\nPersona que tiene los MDs cerrados: <@'+member.id+'>')]})
+                                discordClient.guilds.cache.get(gameObject[0].guild_id).channels.cache.get(gameObject[0].voice_channel_id).delete("Error provocado por jugador")
+                            })
+                        } else if (rolesArray[i] === 2){
+                            gameObject[0].seer_alive.push(member.id);
+                            member.send({embeds: [buildRoleBasedEmbeds('Vidente', 'https://i.imgur.com/0jv7iac.png', 'Podrás ver el rol de un jugador cada noche')]}).catch(() => {
                                 ctrlFlag = 0;
                                 discordClient.guilds.cache.get(gameObject[0].guild_id).channels.cache.get(gameObject[0].text_channel_id).send({embeds:[new MessageEmbed().setTitle('Juego Cancelado').setDescription('Error a la hora de enviar un rol por MD, todos debéis tenerlos abiertos' +
                                         '\n\nPersona que tiene los MDs cerrados: <@'+member.id+'>')]})
