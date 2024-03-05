@@ -12,7 +12,7 @@ module.exports = {
     async gamePreparation (voiceID, discordClient, repository){
 
         let gameObject = await repository.search().where('voice_channel_id').equals(voiceID).return.all();
-        console.log('as')
+        
 
         gameObject[0].state = 56;
 
@@ -20,7 +20,7 @@ module.exports = {
         await discordClient.guilds.cache.get(gameObject[0].guild_id).channels.cache.get(gameObject[0].voice_channel_id).fetch(true).then(
             voiceChannel => {
 
-                console.log("A")
+                
 
                 const voiceMembersSize = voiceChannel.members.size;
                 voiceChannel.setUserLimit(voiceMembersSize, 'Juego comenzado')
@@ -29,9 +29,9 @@ module.exports = {
                     return;
                 }
 
-                console.log(voiceChannel.name)
+                
 
-                console.log("size ->" + voiceChannel.members.size)
+                
                 let lobosSize = 1 //TODO Cambiar esto, solo está puesto por motivos de tests
 
                 if(voiceMembersSize >= 12 && voiceMembersSize <= 17){
@@ -99,7 +99,7 @@ module.exports = {
 
                 if(ctrlFlag) {
 
-                    console.log(rolesArray)
+                    
 
                     repository.save(gameObject[0])
 
